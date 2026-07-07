@@ -1,0 +1,63 @@
+/* Vector design tokens — exact values from the Vector.dc.html prototype.
+   Dark is the default theme; next-themes toggles [data-theme]. */
+
+:root,
+[data-theme='dark'] {
+  --bg: #09090b;
+  --bg-2: #0e0e11;
+  --card: #161619;
+  --card-2: #1c1c20;
+  --border: #27272a;
+  --border-2: #3f3f46;
+  --fg: #fafafa;
+  --fg-2: #a1a1aa;
+  --muted: #71717a;
+  --input: #0e0e11;
+  --track: #27272a;
+  --grid: rgba(255, 255, 255, 0.04);
+}
+
+[data-theme='light'] {
+  --bg: #f6f6f7;
+  --bg-2: #ffffff;
+  --card: #ffffff;
+  --card-2: #f4f4f5;
+  --border: #e4e4e7;
+  --border-2: #d4d4d8;
+  --fg: #09090b;
+  --fg-2: #3f3f46;
+  --muted: #71717a;
+  --input: #ffffff;
+  --track: #ededf0;
+  --grid: rgba(0, 0, 0, 0.035);
+}
+
+/* Accent — overridable at runtime by the accent switcher (sets --primary inline). */
+:root {
+  --primary: #3b82f6;
+  --primary-soft: rgba(59, 130, 246, 0.14);
+  --radius: 0.625rem;
+}
+
+@theme inline {
+  --color-bg: var(--bg);
+  --color-bg-2: var(--bg-2);
+  --color-card: var(--card);
+  --color-card-2: var(--card-2);
+  --color-border: var(--border);
+  --color-border-2: var(--border-2);
+  --color-fg: var(--fg);
+  --color-fg-2: var(--fg-2);
+  --color-muted: var(--muted);
+  --color-input: var(--input);
+  --color-track: var(--track);
+  --color-primary: var(--primary);
+  --color-primary-soft: var(--primary-soft);
+
+  --font-sans: var(--font-geist-sans), ui-sans-serif, system-ui, sans-serif;
+  --font-mono: var(--font-geist-mono), ui-monospace, monospace;
+
+  --radius-lg: var(--radius);
+  --radius-md: calc(var(--radius) - 2px);
+  --radius-sm: calc(var(--radius) - 4px);
+}

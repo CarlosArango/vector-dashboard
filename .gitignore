@@ -1,0 +1,21 @@
+node_modules
+.next
+dist
+out
+.turbo
+coverage
+playwright-report
+test-results
+
+# env
+.env
+.env.local
+.env*.local
+
+# supabase
+.branches
+.temp
+
+# misc
+.DS_Store
+*.log

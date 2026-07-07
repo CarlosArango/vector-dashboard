@@ -1,0 +1,24 @@
+{
+  "name": "@vector/domain",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "exports": {
+    ".": "./src/index.ts",
+    "./enums": "./src/enums/index.ts",
+    "./entities": "./src/entities/index.ts",
+    "./repositories": "./src/repositories/index.ts",
+    "./use-cases": "./src/use-cases/index.ts"
+  },
+  "scripts": {
+    "lint": "eslint .",
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run"
+  },
+  "devDependencies": {
+    "@vector/eslint-config": "workspace:*",
+    "@vector/typescript-config": "workspace:*",
+    "typescript": "^5.7.2",
+    "vitest": "^2.1.8"
+  }
+}

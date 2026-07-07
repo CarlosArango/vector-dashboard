@@ -1,0 +1,4 @@
+-- Vector — no seed data. Start from scratch.
+--
+-- Sign up on /login to create an account; a personal workspace is created
+-- automatically by the handle_new_user() trigger (see 0001_init.sql).

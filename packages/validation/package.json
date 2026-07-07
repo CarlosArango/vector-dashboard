@@ -1,0 +1,22 @@
+{
+  "name": "@vector/validation",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "scripts": {
+    "lint": "eslint .",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@vector/domain": "workspace:*",
+    "zod": "^3.24.1"
+  },
+  "devDependencies": {
+    "@vector/eslint-config": "workspace:*",
+    "@vector/typescript-config": "workspace:*",
+    "typescript": "^5.7.2"
+  }
+}
