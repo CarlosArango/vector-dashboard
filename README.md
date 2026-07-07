@@ -34,6 +34,8 @@ packages/
 supabase/             Migrations, RLS policies, seed (mirrors the design prototype)
 ```
 
+See [`docs/adr`](docs/adr/README.md) for the architecture decision records behind these choices.
+
 - **Use-cases** are pure `(deps, input) => result` functions, unit-tested with in-memory repositories.
 - **Server Actions** validate input with Zod, resolve the authenticated user's workspace, and invoke use-cases with Drizzle repositories.
 - **Reads** happen in Server Components; **writes** go through Server Actions with optimistic TanStack Query updates.
