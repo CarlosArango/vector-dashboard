@@ -1,6 +1,5 @@
 import { notFound } from 'next/navigation';
-import { assertProjectAccess, requireAuthContext } from '@/lib/auth-context';
-import { getRepositories } from '@/lib/container';
+import { requireAuthContext } from '@/lib/auth-context';
 import { getMembers, getProjectById, getProjectTickets } from '@/lib/data';
 import { membersToMap, resolveAvatars } from '@/lib/view-models';
 import { todayISO } from '@/lib/format';
@@ -10,18 +9,14 @@ export default async function ProjectPage({ params }: { params: Promise<{ id: st
   const { id } = await params;
   const { userId, workspaceId } = await requireAuthContext();
 
-  try {
-    await assertProjectAccess(id, workspaceId);
-  } catch {
-    notFound();
-  }
-
+  // Fetch project, members and tickets in one parallel batch. The access check
+  // is done inline against the fetched project — no separate pre-flight query.
   const [project, members, tickets] = await Promise.all([
     getProjectById(id),
     getMembers(workspaceId),
     getProjectTickets(id),
   ]);
-  if (!project) notFound();
+  if (!project || project.workspaceId !== workspaceId) notFound();
 
   const map = membersToMap(members);
   const me = map[userId] ?? { id: userId, initials: '?', color: '', name: 'You' };

@@ -56,6 +56,18 @@ export class InMemoryTicketRepository implements TicketRepository {
   async countByProject(projectId: string) {
     return this.items.filter((t) => t.projectId === projectId).length;
   }
+  async statsByProjects(projectIds: string[]) {
+    const ids = new Set(projectIds);
+    const map = new Map<string, { total: number; done: number }>();
+    for (const t of this.items) {
+      if (!ids.has(t.projectId)) continue;
+      const s = map.get(t.projectId) ?? { total: 0, done: 0 };
+      s.total += 1;
+      if (t.status === 'done') s.done += 1;
+      map.set(t.projectId, s);
+    }
+    return map;
+  }
   async highestPosition(projectId: string, status: TicketStatus) {
     const positions = this.items
       .filter((t) => t.projectId === projectId && t.status === status)

@@ -1,4 +1,4 @@
-import { eq } from 'drizzle-orm';
+import { eq, inArray } from 'drizzle-orm';
 import type { CreateProjectData, Project, ProjectRepository } from '@vector/domain';
 import type { Database } from '../db/client';
 import { projectMembers, projects } from '../db/schema';
@@ -20,7 +20,21 @@ export class DrizzleProjectRepository implements ProjectRepository {
       .select()
       .from(projects)
       .where(eq(projects.workspaceId, workspaceId));
-    return Promise.all(rows.map(async (row) => toProject(row, await this.memberIds(row.id))));
+    if (rows.length === 0) return [];
+
+    // One query for every project's members, grouped in memory — avoids the
+    // per-project N+1 that this loop used to run.
+    const memberRows = await this.db
+      .select({ projectId: projectMembers.projectId, userId: projectMembers.userId })
+      .from(projectMembers)
+      .where(inArray(projectMembers.projectId, rows.map((r) => r.id)));
+    const byProject = new Map<string, string[]>();
+    for (const m of memberRows) {
+      const list = byProject.get(m.projectId) ?? [];
+      list.push(m.userId);
+      byProject.set(m.projectId, list);
+    }
+    return rows.map((row) => toProject(row, byProject.get(row.id) ?? []));
   }
 
   async findById(id: string): Promise<Project | null> {

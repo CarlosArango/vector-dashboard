@@ -17,11 +17,9 @@ export async function listProjects(
   workspaceId: string,
 ): Promise<ProjectWithStats[]> {
   const projects = await deps.projects.listByWorkspace(workspaceId);
-  return Promise.all(
-    projects.map(async (project) => {
-      const tickets = await deps.tickets.listByProject(project.id);
-      const done = tickets.filter((t) => t.status === 'done').length;
-      return { ...project, stats: projectStats(tickets.length, done) };
-    }),
-  );
+  const stats = await deps.tickets.statsByProjects(projects.map((p) => p.id));
+  return projects.map((project) => {
+    const s = stats.get(project.id) ?? { total: 0, done: 0 };
+    return { ...project, stats: projectStats(s.total, s.done) };
+  });
 }

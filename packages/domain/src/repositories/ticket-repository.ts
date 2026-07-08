@@ -21,10 +21,17 @@ export type UpdateTicketData = Partial<
   >
 >;
 
+export interface ProjectTicketStats {
+  total: number;
+  done: number;
+}
+
 export interface TicketRepository {
   listByProject(projectId: string): Promise<Ticket[]>;
   findById(id: string): Promise<Ticket | null>;
   countByProject(projectId: string): Promise<number>;
+  /** Ticket totals keyed by project id, in a single aggregate query. */
+  statsByProjects(projectIds: string[]): Promise<Map<string, ProjectTicketStats>>;
   /** Highest position within a project+status column, or null if empty. */
   highestPosition(projectId: string, status: TicketStatus): Promise<number | null>;
   create(data: CreateTicketData): Promise<Ticket>;

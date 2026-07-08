@@ -1,4 +1,4 @@
-import { and, desc, eq, sql } from 'drizzle-orm';
+import { and, desc, eq, inArray, sql } from 'drizzle-orm';
 import type {
   CreateTicketData,
   Ticket,
@@ -25,6 +25,22 @@ export class DrizzleTicketRepository implements TicketRepository {
   async findById(id: string): Promise<Ticket | null> {
     const [row] = await this.db.select().from(tickets).where(eq(tickets.id, id)).limit(1);
     return row ? toTicket(row) : null;
+  }
+
+  async statsByProjects(
+    projectIds: string[],
+  ): Promise<Map<string, { total: number; done: number }>> {
+    if (projectIds.length === 0) return new Map();
+    const rows = await this.db
+      .select({
+        projectId: tickets.projectId,
+        total: sql<number>`count(*)::int`,
+        done: sql<number>`count(*) filter (where ${tickets.status} = 'done')::int`,
+      })
+      .from(tickets)
+      .where(inArray(tickets.projectId, projectIds))
+      .groupBy(tickets.projectId);
+    return new Map(rows.map((r) => [r.projectId, { total: r.total, done: r.done }]));
   }
 
   async countByProject(projectId: string): Promise<number> {
