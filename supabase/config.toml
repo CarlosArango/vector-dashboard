@@ -53,6 +53,9 @@ default_pool_size = 20
 # Maximum number of client connections allowed.
 max_client_conn = 100
 
+[remotes.main]
+project_id = "naxreexsbnylktzexldr"
+
 # [db.vault]
 # secret_key = "env(SECRET_VALUE)"
 
@@ -200,6 +203,12 @@ password_requirements = ""
 # rp_display_name = "Supabase"
 # rp_id = "localhost"
 # rp_origins = ["http://127.0.0.1:3000"]
+
+
+[remotes.main.auth]
+enabled = true
+site_url = "https://mcp-oauth-consent.vercel.app"
+additional_redirect_urls = ["http://localhost:*/callback"]
 
 [auth.rate_limit]
 # Number of emails that can be sent per hour. Requires auth.email.smtp to be enabled.
