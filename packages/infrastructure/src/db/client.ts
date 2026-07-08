@@ -15,14 +15,19 @@ export function createDatabase(connectionString: string) {
   return drizzle(queryClient, { schema });
 }
 
-let cached: Database | undefined;
+// Pin on globalThis so Next.js dev hot-reloads reuse one pool. Module-scoped
+// state is discarded on reload, but the orphaned postgres() sockets stay open
+// and exhaust the session pooler (pool_size: 15).
+const globalForDb = globalThis as typeof globalThis & {
+  __vectorDb?: Database;
+};
 
 /** Singleton DB using DATABASE_URL — for server runtime. */
 export function getDatabase(): Database {
-  if (!cached) {
+  if (!globalForDb.__vectorDb) {
     const url = process.env.DATABASE_URL;
     if (!url) throw new Error('DATABASE_URL is not set');
-    cached = createDatabase(url);
+    globalForDb.__vectorDb = createDatabase(url);
   }
-  return cached;
+  return globalForDb.__vectorDb;
 }
