@@ -7,8 +7,8 @@ import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.105.4';
 
 // Local dev defaults. For a cloud deploy, swap these for your project's URL and
 // publishable (anon) key, and update connect-src in vercel.json to match.
-const SUPABASE_URL = 'http://127.0.0.1:55221';
-const SUPABASE_ANON_KEY = '<SUPABASE_ANON_KEY>';
+const SUPABASE_URL = 'https://naxreexsbnylktzexldr.supabase.co';
+const SUPABASE_ANON_KEY = 'sb_publishable_kxAbu5Qsy2Q0vtBpjhPXOw_ivXp9Q09';
 
 const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 const $ = (id) => document.getElementById(id);
@@ -37,7 +37,9 @@ async function loadConsent() {
   $('who-email').textContent = sessionData.session?.user?.email ?? 'unknown';
   const { data, error } = await supabase.auth.oauth.getAuthorizationDetails(authorizationId);
   if (error) {
-    setStatus(`Could not load the request: ${error.message}. Restart the connection from your MCP client.`);
+    setStatus(
+      `Could not load the request: ${error.message}. Restart the connection from your MCP client.`,
+    );
     show(null);
     return;
   }
@@ -64,7 +66,9 @@ async function decide(decision) {
   setBusy(true);
   const { data, error } =
     decision === 'approve'
-      ? await supabase.auth.oauth.approveAuthorization(authorizationId, { skipBrowserRedirect: true })
+      ? await supabase.auth.oauth.approveAuthorization(authorizationId, {
+          skipBrowserRedirect: true,
+        })
       : await supabase.auth.oauth.denyAuthorization(authorizationId, { skipBrowserRedirect: true });
   if (error) {
     setBusy(false);
