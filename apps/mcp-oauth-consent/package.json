@@ -1,0 +1,9 @@
+{
+  "name": "mcp-oauth-consent",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Static OAuth consent page for the Vector MCP server (deployed to Vercel)",
+  "scripts": {
+    "deploy": "vercel deploy --prod"
+  }
+}

@@ -165,6 +165,8 @@ additional_redirect_urls = [
   "http://127.0.0.1:3000/auth/callback",
   "http://localhost:3000",
   "http://localhost:3000/auth/callback",
+  "http://localhost:54121/callback",
+  "http://127.0.0.1:54121/callback",
 ]
 # How long tokens are valid for, in seconds. Defaults to 3600 (1 hour), maximum 604,800 (1 week).
 jwt_expiry = 3600
@@ -379,11 +381,16 @@ enabled = false
 # OAuth server configuration
 [auth.oauth_server]
 # Enable OAuth server functionality
-enabled = false
+enabled = true
 # Path for OAuth consent flow UI
 authorization_url_path = "/oauth/consent"
-# Allow dynamic client registration
-allow_dynamic_registration = false
+# Allow dynamic client registration (MCP clients self-register)
+allow_dynamic_registration = true
+
+# Remote MCP server (OAuth 2.1 resource server). No static JWT verification —
+# the function validates the Bearer token itself and builds an RLS-scoped client.
+[functions.mcp]
+verify_jwt = false
 
 [edge_runtime]
 enabled = true

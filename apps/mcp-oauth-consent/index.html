@@ -1,0 +1,43 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Vector — Connect</title>
+    <style>
+      :root { color-scheme: light dark; font-family: -apple-system, system-ui, sans-serif; }
+      body { display: grid; place-items: center; min-height: 100vh; margin: 0; }
+      main { width: min(92vw, 380px); padding: 2rem; }
+      h1 { font-size: 1.4rem; }
+      input { display: block; width: 100%; box-sizing: border-box; margin: 0.5rem 0; padding: 0.6rem; font-size: 1rem; }
+      button { padding: 0.6rem 1.2rem; font-size: 1rem; margin-right: 0.5rem; margin-top: 0.5rem; cursor: pointer; }
+      .error { color: #c0392b; min-height: 1.2em; }
+      .muted { opacity: 0.7; font-size: 0.9rem; } a { color: inherit; }
+      [hidden] { display: none !important; }
+    </style>
+  </head>
+  <body>
+    <main>
+      <h1>Vector</h1>
+      <p id="status">Loading…</p>
+      <section id="login" hidden>
+        <form id="auth-form">
+          <input id="email" type="email" placeholder="Email" autocomplete="email" required />
+          <input id="password" type="password" placeholder="Password" autocomplete="current-password" minlength="6" required />
+          <button id="signin-btn" type="submit">Sign in</button>
+          <button id="signup-btn" type="button">Create account</button>
+        </form>
+        <p id="auth-error" class="error"></p>
+      </section>
+      <section id="consent" hidden>
+        <p class="muted">Signed in as <span id="who-email"></span> · <a href="#" id="signout-link">Not you?</a></p>
+        <p><strong id="client-name"></strong> wants access to your Vector workspace.</p>
+        <ul id="scopes"></ul>
+        <button id="approve-btn">Approve</button>
+        <button id="deny-btn">Deny</button>
+        <p id="consent-error" class="error"></p>
+      </section>
+    </main>
+    <script type="module" src="/consent.js"></script>
+  </body>
+</html>
