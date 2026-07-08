@@ -7,7 +7,7 @@ export type Schema = typeof schema;
 export type Database = ReturnType<typeof createDatabase>;
 
 /**
- * Drizzle client over Supabase Postgres. Uses a small pool suited to
+ * Drizzle c over Supabase Postgres. Uses a small pool suited to
  * serverless — point DATABASE_URL at the Supabase transaction pooler in prod.
  */
 export function createDatabase(connectionString: string) {
