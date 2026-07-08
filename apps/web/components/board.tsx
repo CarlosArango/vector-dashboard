@@ -197,6 +197,7 @@ export function Board({
 
   return (
     <DndContext
+      id="board"
       sensors={sensors}
       collisionDetection={closestCorners}
       onDragStart={(e: DragStartEvent) => setActiveId(String(e.active.id))}
