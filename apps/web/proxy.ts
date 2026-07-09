@@ -29,9 +29,13 @@ export async function proxy(request: NextRequest) {
     },
   );
 
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
+  // getClaims verifies the JWT locally against the cached JWKS (asymmetric
+  // signing keys) instead of a network round-trip to the auth server on every
+  // request. It calls getSession() internally, so an expired access token is
+  // still refreshed via the refresh token. Falls back to getUser() only for
+  // symmetric (HS*) tokens.
+  const { data } = await supabase.auth.getClaims();
+  const user = data?.claims ?? null;
 
   const { pathname } = request.nextUrl;
   const isPublic = PUBLIC_PATHS.some((p) => pathname.startsWith(p));

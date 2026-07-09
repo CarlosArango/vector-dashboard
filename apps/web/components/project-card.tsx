@@ -1,18 +1,39 @@
 'use client';
 
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
+import { useQueryClient } from '@tanstack/react-query';
 import { Clock, DotsThree } from '@phosphor-icons/react';
 import { PhIcon } from './ph-icon';
 import { Progress } from '@vector/ui/progress';
 import { AvatarStack } from '@vector/ui/avatar';
 import { formatDue } from '@/lib/format';
 import { hexA } from './priority-badge';
+import { ticketsKey } from '@/hooks/use-tickets';
+import { listTicketsAction } from '@/app/actions/tickets';
 import type { ProjectCardVM } from './projects-view';
 
 export function ProjectCard({ card }: { card: ProjectCardVM }) {
+  const router = useRouter();
+  const queryClient = useQueryClient();
+
+  // Warm both the route (JS + loading shell) and the ticket data before the
+  // click lands, so opening the board is instant instead of paying the fetch
+  // on navigation. Runs once — prefetchQuery no-ops while the data is fresh.
+  function warm() {
+    router.prefetch(`/projects/${card.id}`);
+    queryClient.prefetchQuery({
+      queryKey: ticketsKey(card.id),
+      queryFn: () => listTicketsAction(card.id),
+      staleTime: 30_000,
+    });
+  }
+
   return (
     <Link
       href={`/projects/${card.id}`}
+      onMouseEnter={warm}
+      onFocus={warm}
       className="animate-vrise block cursor-pointer rounded-xl border border-border bg-card p-[18px] transition-[border-color,transform] hover:border-border-2 hover:shadow-[0_4px_16px_rgba(0,0,0,0.14)]"
     >
       <div className="mb-4 flex items-start justify-between">
