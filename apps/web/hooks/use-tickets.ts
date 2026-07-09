@@ -2,7 +2,7 @@
 
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import type { Ticket, TicketStatus } from '@vector/domain';
-import type { UpdateTicketValues } from '@vector/validation';
+import type { CreateTicketValues, UpdateTicketValues } from '@vector/validation';
 import { listTicketsAction } from '@/app/actions/tickets';
 import {
   createTicketAction,
@@ -82,8 +82,7 @@ export function useUpdateTicket(projectId: string) {
 export function useCreateTicket(projectId: string) {
   const qc = useQueryClient();
   return useMutation({
-    mutationFn: (input: { projectId: string; title: string; status?: TicketStatus }) =>
-      createTicketAction(input),
+    mutationFn: (input: CreateTicketValues) => createTicketAction(input),
     onSettled: () => qc.invalidateQueries({ queryKey: ticketsKey(projectId) }),
   });
 }

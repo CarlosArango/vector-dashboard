@@ -17,7 +17,7 @@ import { SegmentedControl } from '@vector/ui/segmented-control';
 import { Board } from './board';
 import { BoardSkeleton } from './board-skeleton';
 import { ListTable } from './list-table';
-import { TicketSheet } from './ticket-sheet';
+import { TicketSheet, type CreateDraft } from './ticket-sheet';
 import { useCreateTicket, useTickets } from '@/hooks/use-tickets';
 import type { AvatarVM } from '@/lib/view-models';
 
@@ -43,6 +43,7 @@ export function ProjectView({
   const [view, setView] = React.useState<'board' | 'list'>('board');
   const [search, setSearch] = React.useState('');
   const [openId, setOpenId] = React.useState<string | null>(null);
+  const [creating, setCreating] = React.useState<TicketStatus | null>(null);
 
   // Gate the data-dependent content so the server render and the first client
   // paint both show the skeleton — a warm React Query cache would otherwise
@@ -58,9 +59,29 @@ export function ProjectView({
 
   const openTicket = tickets.find((t) => t.id === openId) ?? null;
 
-  async function handleNewTicket(status: TicketStatus = 'backlog') {
-    const res = await createTicket.mutateAsync({ projectId: project.id, title: 'Untitled ticket', status });
-    if (res.ok && res.data) setOpenId(res.data.id);
+  // Open a blank draft sheet — nothing is persisted until the user hits Create.
+  function handleNewTicket(status: TicketStatus = 'backlog') {
+    setOpenId(null);
+    setCreating(status);
+  }
+
+  function handleCreate(values: CreateDraft) {
+    createTicket.mutate(
+      { projectId: project.id, ...values },
+      {
+        onSuccess: (res) => {
+          if (res.ok && res.data) {
+            setCreating(null);
+            setOpenId(res.data.id); // reopen the persisted ticket in edit mode
+          }
+        },
+      },
+    );
+  }
+
+  function closeSheet() {
+    setOpenId(null);
+    setCreating(null);
   }
 
   return (
@@ -126,8 +147,12 @@ export function ProjectView({
       )}
 
       <TicketSheet
-        key={openTicket?.id ?? 'none'}
+        key={openTicket?.id ?? (creating !== null ? 'create' : 'none')}
+        open={!!openTicket || creating !== null}
         ticket={openTicket}
+        createStatus={creating ?? undefined}
+        creating={createTicket.isPending}
+        onCreate={handleCreate}
         projectId={project.id}
         projectName={project.name}
         projectColor={project.color}
@@ -135,7 +160,7 @@ export function ProjectView({
         membersMap={membersMap}
         currentUser={currentUser}
         today={today}
-        onClose={() => setOpenId(null)}
+        onClose={closeSheet}
       />
     </>
   );
