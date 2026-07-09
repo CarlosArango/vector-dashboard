@@ -14,7 +14,7 @@ export function ticketsKey(projectId: string) {
   return ['tickets', projectId] as const;
 }
 
-export function useTickets(projectId: string, initialData: Ticket[]) {
+export function useTickets(projectId: string, initialData?: Ticket[]) {
   return useQuery({
     queryKey: ticketsKey(projectId),
     queryFn: () => listTicketsAction(projectId),

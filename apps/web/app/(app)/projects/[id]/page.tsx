@@ -1,6 +1,6 @@
 import { notFound } from 'next/navigation';
 import { requireAuthContext } from '@/lib/auth-context';
-import { getMembers, getProjectById, getProjectTickets } from '@/lib/data';
+import { getMembers, getProjectById } from '@/lib/data';
 import { membersToMap, resolveAvatars } from '@/lib/view-models';
 import { todayISO } from '@/lib/format';
 import { ProjectView } from '@/components/project-view';
@@ -9,13 +9,10 @@ export default async function ProjectPage({ params }: { params: Promise<{ id: st
   const { id } = await params;
   const { userId, workspaceId } = await requireAuthContext();
 
-  // Fetch project, members and tickets in one parallel batch. The access check
-  // is done inline against the fetched project — no separate pre-flight query.
-  const [project, members, tickets] = await Promise.all([
-    getProjectById(id),
-    getMembers(workspaceId),
-    getProjectTickets(id),
-  ]);
+  // Only the lightweight project + members are fetched server-side; the ticket
+  // list is loaded client-side via React Query (warmed by hover prefetch). This
+  // keeps the HTML small and lets a warm cache render the board instantly.
+  const [project, members] = await Promise.all([getProjectById(id), getMembers(workspaceId)]);
   if (!project || project.workspaceId !== workspaceId) notFound();
 
   const map = membersToMap(members);
@@ -27,7 +24,6 @@ export default async function ProjectPage({ params }: { params: Promise<{ id: st
       projectAvatars={resolveAvatars(project.memberIds, map)}
       members={members.map((m) => map[m.id]!)}
       membersMap={map}
-      initialTickets={tickets}
       today={todayISO()}
       currentUser={me}
     />

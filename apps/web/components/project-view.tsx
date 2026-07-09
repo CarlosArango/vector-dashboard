@@ -9,12 +9,13 @@ import {
   Plus,
   Rows,
 } from '@phosphor-icons/react';
-import type { Ticket, TicketStatus } from '@vector/domain';
+import type { TicketStatus } from '@vector/domain';
 import { Button } from '@vector/ui/button';
 import { Input } from '@vector/ui/input';
 import { AvatarStack } from '@vector/ui/avatar';
 import { SegmentedControl } from '@vector/ui/segmented-control';
 import { Board } from './board';
+import { BoardSkeleton } from './board-skeleton';
 import { ListTable } from './list-table';
 import { TicketSheet } from './ticket-sheet';
 import { useCreateTicket, useTickets } from '@/hooks/use-tickets';
@@ -25,7 +26,6 @@ interface ProjectViewProps {
   projectAvatars: AvatarVM[];
   members: AvatarVM[];
   membersMap: Record<string, AvatarVM>;
-  initialTickets: Ticket[];
   today: string;
   currentUser: AvatarVM;
 }
@@ -35,15 +35,21 @@ export function ProjectView({
   projectAvatars,
   members,
   membersMap,
-  initialTickets,
   today,
   currentUser,
 }: ProjectViewProps) {
-  const { data: tickets } = useTickets(project.id, initialTickets);
+  const { data: tickets = [], isPending } = useTickets(project.id);
   const createTicket = useCreateTicket(project.id);
   const [view, setView] = React.useState<'board' | 'list'>('board');
   const [search, setSearch] = React.useState('');
   const [openId, setOpenId] = React.useState<string | null>(null);
+
+  // Gate the data-dependent content so the server render and the first client
+  // paint both show the skeleton — a warm React Query cache would otherwise
+  // hydrate different HTML than the (empty) server render and mismatch.
+  const [mounted, setMounted] = React.useState(false);
+  React.useEffect(() => setMounted(true), []);
+  const showSkeleton = !mounted || (isPending && tickets.length === 0);
 
   const q = search.trim().toLowerCase();
   const filtered = q
@@ -99,7 +105,9 @@ export function ProjectView({
         </div>
       </header>
 
-      {view === 'board' ? (
+      {showSkeleton ? (
+        <BoardSkeleton />
+      ) : view === 'board' ? (
         <Board
           projectId={project.id}
           tickets={filtered}
